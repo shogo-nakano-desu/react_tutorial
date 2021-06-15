@@ -18,6 +18,7 @@ const Square = () => {
 }
 
 const Board = () => {
+  const [sqeares, setSqares] = useState(Array(9).fill(null));
   
   const renderSquare = (i) => {
     return <Square value={i} />;
