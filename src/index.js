@@ -1,27 +1,32 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
-const Square = () => {
-  // valueを追加して、クリックしたときの状態を保持するように書き換え  
-  const [value, setValue] = useState(null);
-
-  const handleClick = () =>{
-    setValue(() => "X");
-  }
-
+const Square = (props) => {
   return (
     <button className="square" 
-    onClick={handleClick}>
-      {value}
+      onClick={() => props.onClick()}>
+      {props.value}
     </button>
   );
 }
 
 const Board = () => {
-  const [sqeares, setSqares] = useState(Array(9).fill(null));
-  
+  const [squares, setSquares] = useState(Array(9).fill(null));
+  console.log(squares);
+
+  const handleClick = (i) => {
+    const squaresval = squares.slice();
+    squaresval[i] = 'X';
+    setSquares(() => squaresval);
+  }
+
   const renderSquare = (i) => {
-    return <Square value={i} />;
+    return( 
+      <Square 
+        value={squares[i]}
+        onClick={() => handleClick(i)}
+      />
+    );
   }
 
   const status = 'Next player: X';
