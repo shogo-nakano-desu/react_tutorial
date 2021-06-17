@@ -68,7 +68,7 @@ const calculateWinner = (squares) => {
 const Game = () => {
   // classのconstructorに当たる処理
   const [squares, setSquares] = useState(Array(9).fill(null));
-  const [history, setHistory] = useState(squares);
+  const [history, setHistory] = useState([squares]);
   const [xIsNext, setXIsNext] = useState(true);
   
   const current = history[history.length-1];
