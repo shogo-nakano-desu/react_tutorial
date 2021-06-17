@@ -43,46 +43,46 @@ const Board = (props) => {
   );
 }
 
-const calculateWinner = (squares) => {
-  // この線上に同じ値が並んでいたら勝ち
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
-}
 
 
-const Game = () => {
+
+const Game = (props) => {
   // classのconstructorに当たる処理
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [history, setHistory] = useState([squares]);
+  // const [squares, setSquares] = useState(Array(9).fill(null));
+  const [history, setHistory] = useState([{squares: Array(9).fill(null)}]);
   const [xIsNext, setXIsNext] = useState(true);
   
   const current = history[history.length-1];
-
   const handleClick = (i) => {
-    const squaresval = current.squares.slice();
-    if (calculateWinner(squaresval) || squaresval[i]) {
+    const squares = current.squares.slice();
+    if (calculateWinner(squares) || squares[i]) {
       return;
     }
-    squaresval[i] = xIsNext ? 'x' : 'o';
-    setSquares(() => squaresval);
-    setHistory(() => history.concat(squares));
+    squares[i] = xIsNext ? 'x' : 'o';
+    setHistory(() => history.concat([{squares: squares}]));
     setXIsNext(() => !xIsNext);
   }
+  // 外にあった関数を中に入れた
+  const calculateWinner = (squares) => {
+    // この線上に同じ値が並んでいたら勝ち
+    const lines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
+    ];
+    for (let i = 0; i < lines.length; i++) {
+      const [a, b, c] = lines[i];
+      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+        return squares[a];
+      }
+    }
+    return null;
+  };
   
   // 判定処理に基づき、表示するwinnerを出しわける処理
   const winner = calculateWinner(current.squares);
@@ -115,4 +115,3 @@ ReactDOM.render(
   <Game />,
   document.getElementById('root')
 );
-
