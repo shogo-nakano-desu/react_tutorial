@@ -1,9 +1,6 @@
 // 今の問題はgo to moveで戻っても、どこかをクリックすると戻った状態の次の状態になってしまう。
 // handleClick関数とmovesで定義している関数との中で、stepNumberがそれぞれ独立してしまっていることが分かった。
 // これらは上位のGameコンポーネントの中で制御しているstepNumberを使っているはず？なのに、なんで状態がリンクしていないのだろう？
-
-
-
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -51,21 +48,16 @@ const Board = (props) => {
 }
 
 
-const Game = (props) => {
-  // classのconstructorに当たる処理
-  // const [squares, setSquares] = useState(Array(9).fill(null));
+const Game = () => {
   const [history, setHistory] = useState([{squares: Array(9).fill(null)}]);
   const [xIsNext, setXIsNext] = useState(true);
   const [stepNumber, setStepNumber] = useState(0);
   const rendercurrent = history[stepNumber];
-
   // どのマスをクリックしたかがiに入っている
   const handleClick = (i) => {
     // history: [{squares: Array(9).fill(null)}, {squares: Array(9).fill(null)},...]でで来ている。{squares: Array(9).fill(null)}は１回クリックされる毎に追加されていく。
     // timeTraveledHistory: historyをstepNumberの順番までで切り取ったもの。timeTravelした際にstepNumberがきちんと更新されればその時点のhistoryに飛べるはず。
-    // ここにバグがありそう。historyがまた使われてしまい、history自身は更新されていないのでまた同じ切り取り方をしてしまう。
-    // ⇒const timeTravelHistory=history.slice(0, stepNumber+1);から書き換え
-    setHistory(() => history.slice(0, stepNumber+1));
+    setHistory(history.slice(0, stepNumber+1));
     console.log(`マス目をクリックした際のhistory: ${history}`)
     // current: 今時点のhistoryを切り出し
     const current = history[history.length - 1];
@@ -76,9 +68,9 @@ const Game = (props) => {
       return;
     }
     squares[i] = xIsNext ? 'x' : 'o';
-    setHistory(() => history.concat([{squares: squares}]));
-    setStepNumber(() => history.length);
-    setXIsNext(() => !xIsNext);
+    setHistory(history.concat([{squares: squares}]));
+    setStepNumber(history.length);
+    setXIsNext(!xIsNext);
     console.log(`マス目をクリックした際のstepNumber ${stepNumber}`);
   };
 
