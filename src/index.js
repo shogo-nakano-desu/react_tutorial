@@ -1,4 +1,7 @@
 // 今の問題はgo to moveで戻っても、どこかをクリックすると戻った状態の次の状態になってしまう。
+// handleClick関数とmovesで定義している関数との中で、stepNumberがそれぞれ独立してしまっていることが分かった。
+// これらは上位のGameコンポーネントの中で制御しているstepNumberを使っているはず？なのに、なんで状態がリンクしていないのだろう？
+
 
 
 import React, { useState } from 'react';
@@ -76,14 +79,14 @@ const Game = (props) => {
     setHistory(() => history.concat([{squares: squares}]));
     setStepNumber(() => history.length);
     setXIsNext(() => !xIsNext);
-    console.log(stepNumber);
+    console.log(`マス目をクリックした際のstepNumber ${stepNumber}`);
   };
 
   const jumpTo = (step) => {
-    console.log(`jumpToが動いた際のstepNumber: ${stepNumber}`);
-    setStepNumber(() => step);
+    console.log(`setStepNumber前のstepNumber: ${stepNumber}`);
+    setStepNumber(step);
     console.log(`setStepNumber後のstepNumber: ${stepNumber}`);
-    setXIsNext(() => (step%2) === 0);
+    setXIsNext((step%2) === 0);
   };
 
   // 一見stepNumberの値が変わっているように見えるのだが、スコープが異なっている？
