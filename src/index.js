@@ -1,5 +1,9 @@
+// 今の問題はgo to moveで戻っても、どこかをクリックすると戻った状態の次の状態になってしまう。
+
+
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+
 
 const Square = (props) => {
   return (
@@ -44,8 +48,6 @@ const Board = (props) => {
 }
 
 
-
-
 const Game = (props) => {
   // classのconstructorに当たる処理
   // const [squares, setSquares] = useState(Array(9).fill(null));
@@ -54,37 +56,50 @@ const Game = (props) => {
   const [stepNumber, setStepNumber] = useState(0);
   const rendercurrent = history[stepNumber];
 
-
-  const jumpTo = (step) => {
-    setStepNumber(() => step);
-    setXIsNext(() => (step%2) === 0);
-  };
-
-  const moves = history.map((step, move) => {
-    const desc = move ?
-      'Go to move #' + move :
-      'Go to move start';
-    return (
-      <li key={move}>
-        <button onClick={() => jumpTo(move)}>{desc}</button>
-      </li>
-    );
-  });
-
-  
-  
+  // どのマスをクリックしたかがiに入っている
   const handleClick = (i) => {
+    // history: [{squares: Array(9).fill(null)}, {squares: Array(9).fill(null)},...]でで来ている。{squares: Array(9).fill(null)}は１回クリックされる毎に追加されていく。
+    // timeTraveledHistory: historyをstepNumberの順番までで切り取ったもの。timeTravelした際にstepNumberがきちんと更新されればその時点のhistoryに飛べるはず。
+    // ここにバグがありそう。historyがまた使われてしまい、history自身は更新されていないのでまた同じ切り取り方をしてしまう。
+    // ⇒const timeTravelHistory=history.slice(0, stepNumber+1);から書き換え
+    setHistory(() => history.slice(0, stepNumber+1));
+    console.log(`マス目をクリックした際のhistory: ${history}`)
+    // current: 今時点のhistoryを切り出し
     const current = history[history.length - 1];
-    const timeTraveledHistory = history.slice(0, stepNumber+1);
+    // squraresは今どのマス目が何で埋まっているか。(9)[null, null, null, "o", null, "x", null, "x", null]とか
+    // currentからsquaresオブジェクトを選択し、slice⇒浅いコピーを作ってsquaresとして保管
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
     squares[i] = xIsNext ? 'x' : 'o';
     setHistory(() => history.concat([{squares: squares}]));
-    setStepNumber(() => timeTraveledHistory.length);
+    setStepNumber(() => history.length);
     setXIsNext(() => !xIsNext);
-  }
+    console.log(stepNumber);
+  };
+
+  const jumpTo = (step) => {
+    console.log(`jumpToが動いた際のstepNumber: ${stepNumber}`);
+    setStepNumber(() => step);
+    console.log(`setStepNumber後のstepNumber: ${stepNumber}`);
+    setXIsNext(() => (step%2) === 0);
+  };
+
+  // 一見stepNumberの値が変わっているように見えるのだが、スコープが異なっている？
+  const moves = history.map((step, stepNumber) => {
+    // クリックした後も、stepNumberが残って全部描画されてしまっている。
+    console.log(`moves内のstepNumber: ${stepNumber}`);
+    const desc = stepNumber ?
+      'Go to move #' + stepNumber :
+      'Go to move start';
+    return (
+      <li key={stepNumber}>
+        <button onClick={() => jumpTo(stepNumber)}>{desc}</button>
+      </li>
+    );
+  });
+
   // 外にあった関数を中に入れた
   const calculateWinner = (squares) => {
     // この線上に同じ値が並んでいたら勝ち
