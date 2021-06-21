@@ -48,10 +48,9 @@ const Game = () => {
   const handleClick = (i) => {
     // history: [{squares: Array(9).fill(null)}, {squares: Array(9).fill(null)},...]でで来ている。{squares: Array(9).fill(null)}は１回クリックされる毎に追加されていく。
     // timeTraveledHistory: historyをstepNumberの順番までで切り取ったもの。timeTravelした際にstepNumberがきちんと更新されればその時点のhistoryに飛べるはず。
-    setHistory(history.slice(0, stepNumber + 1));
-    console.log(`マス目をクリックした際のhistory: ${history}`);
+    const timeTraveledHistory = history.slice(0, stepNumber + 1);
     // current: 今時点のhistoryを切り出し
-    const current = history[history.length - 1];
+    const current = timeTraveledHistory[timeTraveledHistory.length - 1];
     // squraresは今どのマス目が何で埋まっているか。(9)[null, null, null, "o", null, "x", null, "x", null]とか
     // currentからsquaresオブジェクトを選択し、slice⇒浅いコピーを作ってsquaresとして保管
 
@@ -60,8 +59,9 @@ const Game = () => {
       return;
     }
     squares[i] = xIsNext ? "x" : "o";
-    setHistory(history.concat([{ squares: squares }]));
-    setStepNumber(history.length);
+    const newHistory = timeTraveledHistory.concat([{ squares: squares }]);
+    setHistory(newHistory);
+    setStepNumber(newHistory.length);
     setXIsNext(!xIsNext);
     console.log(`マス目をクリックした際のstepNumber ${stepNumber}`);
   };
