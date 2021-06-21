@@ -47,30 +47,33 @@ const Game = () => {
   // どのマスをクリックしたかがiに入っている
   const handleClick = (i) => {
     // history: [{squares: Array(9).fill(null)}, {squares: Array(9).fill(null)},...]でで来ている。{squares: Array(9).fill(null)}は１回クリックされる毎に追加されていく。
-    // timeTraveledHistory: historyをstepNumberの順番までで切り取ったもの。timeTravelした際にstepNumberがきちんと更新されればその時点のhistoryに飛べるはず。
-    const timeTraveledHistory = history.slice(0, stepNumber + 1);
-    // current: 今時点のhistoryを切り出し
-    const current = timeTraveledHistory[timeTraveledHistory.length - 1];
+    // latestHistory: historyをstepNumberの順番までで切り取ったもの。timeTravelした際にstepNumberがきちんと更新されればその時点のhistoryに飛べるはず。
+    const latestHistories = history.slice(0, stepNumber + 1);
+    // current: 一番最後に追加したhistoryを切り出している
+    const currentHistory = latestHistories[latestHistories.length - 1];
     // squraresは今どのマス目が何で埋まっているか。(9)[null, null, null, "o", null, "x", null, "x", null]とか
-    // currentからsquaresオブジェクトを選択し、slice⇒浅いコピーを作ってsquaresとして保管
-
-    const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    // currentHisotoryからsquaresオブジェクトを選択し、slice⇒浅いコピーを作ってsquaresMemberとして保管
+    const squaresMember = currentHistory.squares.slice();
+    if (calculateWinner(squaresMember) || squaresMember[i]) {
       return;
     }
-    squares[i] = xIsNext ? "x" : "o";
-    const newHistory = timeTraveledHistory.concat([{ squares: squares }]);
+    // squareに"x" or "o"を設置
+    squaresMember[i] = xIsNext ? "x" : "o";
+    // concatで配列を追加する。
+    const newHistory = latestHistories.concat([{ squares: squaresMember }]);
     setHistory(newHistory);
-    setStepNumber(newHistory.length);
+    const nextStepNumber = newHistory.length - 1;
+    setStepNumber(nextStepNumber);
     setXIsNext(!xIsNext);
-    console.log(`マス目をクリックした際のstepNumber ${stepNumber}`);
+    console.log(`マス目をクリックした際のstepNumber ${nextStepNumber}`);
   };
 
   const jumpTo = (step) => {
     console.log(`setStepNumber前のstepNumber: ${stepNumber}`);
-    setStepNumber(step);
-    console.log(`setStepNumber後のstepNumber: ${stepNumber}`);
-    setXIsNext(step % 2 === 0);
+    const moveToStepNumber = step;
+    setStepNumber(moveToStepNumber);
+    console.log(`setStepNumber後のstepNumber: ${moveToStepNumber}`);
+    setXIsNext(moveToStepNumber % 2 === 0);
   };
 
   // 一見stepNumberの値が変わっているように見えるのだが、スコープが異なっている？
@@ -112,6 +115,8 @@ const Game = () => {
   };
 
   // 判定処理に基づき、表示するwinnerを出しわける処理
+  // ここでsquaresがundefinedだよとなる。
+  // 計算したい対象は、今対象となっているsquaresMember。今操作中のsquaresMemberを引数に取れればOK
   const winner = calculateWinner(rendercurrent.squares);
   let status;
   if (winner) {
